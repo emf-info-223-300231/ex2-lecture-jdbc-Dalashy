@@ -7,6 +7,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DbWorker implements DbWorkerItf {
 
@@ -22,14 +24,14 @@ public class DbWorker implements DbWorkerItf {
 
     @Override
     public void connecterBdMySQL(String nomDB) throws MyDBException {
-        final String url_local = "jdbc:mysql://localhost:3306/" + nomDB;
+        final String url_local = "jdbc:mysql://localhost:3306/" + nomDB + "?serverTimeZone=UTC";
         final String url_remote = "jdbc:mysql://LAPEMFB37-21.edu.net.fr.ch:3306/" + nomDB;
         final String user = "root";
         final String password = "emf123";
 
-        System.out.println("url:" + url_remote);
+        System.out.println("url:" + url_local);
         try {
-            dbConnexion = DriverManager.getConnection(url_remote, user, password);
+            dbConnexion = DriverManager.getConnection(url_local, user, password);
         } catch (SQLException ex) {
             throw new MyDBException(SystemLib.getFullMethodName(), ex.getMessage());
         }
@@ -72,22 +74,43 @@ public class DbWorker implements DbWorkerItf {
 
     public List<Personne> lirePersonnes() throws MyDBException {
         listePersonnes = new ArrayList<>();
-        
+        Statement st;
+        ResultSet rs;
+        try {
+            st = dbConnexion.createStatement();
+            rs = st.executeQuery("select Nom, Prenom from t_personne");
+
+            while (rs.next()) {
+                Personne test = new Personne(rs.getString("Nom"), rs.getString("Prenom"));
+                listePersonnes.add(test);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DbWorker.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return listePersonnes;
     }
 
     @Override
     public Personne precedentPersonne() throws MyDBException {
-
-        return null;
-
+        int ind = index;
+        if (listePersonnes == null) {
+            lirePersonnes();
+        }
+        if (ind > 0) {
+            index--;
+        }
+        return listePersonnes.get(ind);
     }
 
     @Override
     public Personne suivantPersonne() throws MyDBException {
-
-        return null;
-
+        if (listePersonnes == null) {
+            lirePersonnes();
+        }
+        if(index < (listePersonnes.size()-1)){
+        index++;
+        }
+        return listePersonnes.get(index);
     }
 
 }
