@@ -2,6 +2,7 @@ package app.workers;
 
 import app.beans.Personne;
 import app.exceptions.MyDBException;
+import app.helpers.JfxPopup;
 import app.helpers.SystemLib;
 import java.sql.*;
 import java.util.ArrayList;
@@ -85,7 +86,7 @@ public class DbWorker implements DbWorkerItf {
                 listePersonnes.add(test);
             }
         } catch (SQLException ex) {
-            Logger.getLogger(DbWorker.class.getName()).log(Level.SEVERE, null, ex);
+            throw new MyDBException(SystemLib.getFullMethodName(), ex.getMessage());
         }
         return listePersonnes;
     }

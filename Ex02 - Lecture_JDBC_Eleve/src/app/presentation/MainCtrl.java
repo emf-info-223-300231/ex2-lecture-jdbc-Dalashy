@@ -50,7 +50,7 @@ public class MainCtrl implements Initializable {
             Personne p = dbWrk.precedentPersonne();
             afficherPersonne(p);
         } catch (MyDBException o) {
-
+            JfxPopup.displayError("ERREUR", "Une erreur s'est produite", o.getMessage());
         }
     }
 
@@ -60,7 +60,7 @@ public class MainCtrl implements Initializable {
             Personne p = dbWrk.suivantPersonne();
             afficherPersonne(p);
         } catch (MyDBException o) {
-
+            JfxPopup.displayError("ERREUR", "Une erreur s'est produite", o.getMessage());
         }
     }
 
